@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: My Finance Plugin
+ * Plugin Name: My Finance
  * Description: Σύστημα Διαχείρισης Εσόδων - Εξόδων.
  * Version: 1.0
  * Author: Konstantina
@@ -10,9 +10,9 @@
 
 if (!defined('ABSPATH')) exit;
 
-add_action('init', 'fin_register_core_structures');
+add_action('init', 'my_fin_register_core_structures');
 
-function fin_register_core_structures() {
+function my_fin_register_core_structures() {
     
     register_taxonomy('fin_category', 'fin_transaction', [
         'label'        => 'Κατηγορίες',
