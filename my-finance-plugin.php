@@ -44,4 +44,10 @@ add_action('init', function() {
         'single'       => true,
         'type'         => 'string', //  YYYY-MM-DD
     ]);
+    // Πεδίο για το σχόλιο
+    register_post_meta('fin_transaction', 'fin_description', [
+    'show_in_rest' => true,
+    'single'       => true,
+    'type'         => 'string',
+    ]);
 });
