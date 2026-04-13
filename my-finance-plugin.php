@@ -1,21 +1,23 @@
 <?php
 /**
- * Plugin Name: My Finance Plugin
+ * Plugin Name: My Finance
  * Description: Σύστημα Διαχείρισης Εσόδων - Εξόδων.
  * Version: 1.0
  * Author: Konstantina
+ * License: GPL2
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if (!defined('ABSPATH')) exit;
 
-add_action('init', 'fin_register_core_structures');
+add_action('init', 'my_fin_register_core_structures');
 
-function fin_register_core_structures() {
+function my_fin_register_core_structures() {
     
     register_taxonomy('fin_category', 'fin_transaction', [
         'label'        => 'Κατηγορίες',
         'hierarchical' => true,
-        'show_in_rest' => true, // Απαραίτητο για το REST API [cite: 39]
+        'show_in_rest' => true, 
         'show_admin_column' => true,
     ]);
 
@@ -23,8 +25,23 @@ function fin_register_core_structures() {
     register_post_type('fin_transaction', [
         'labels'      => ['name' => 'Συναλλαγές', 'singular_name' => 'Συναλλαγή'],
         'public'      => true,
-        'show_in_rest' => true, // Επιτρέπει τη χρήση Fetch API [cite: 39]
+        'show_in_rest' => true,
         'menu_icon'   => 'dashicons-chart-line',
         'supports'    => ['title', 'editor', 'custom-fields'],
     ]);
 }
+
+// Δήλωση του πεδίου Ποσό
+add_action('init', function() {
+    register_post_meta('fin_transaction', 'fin_amount', [
+        'show_in_rest' => true,
+        'single'       => true,
+        'type'         => 'number',
+    ]);
+    // Πεδίο για την Ημερομηνία
+    register_post_meta('fin_transaction', 'fin_date', [
+        'show_in_rest' => true,
+        'single'       => true,
+        'type'         => 'string', //  YYYY-MM-DD
+    ]);
+});
