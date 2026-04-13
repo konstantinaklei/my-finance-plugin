@@ -38,4 +38,10 @@ add_action('init', function() {
         'single'       => true,
         'type'         => 'number',
     ]);
+    // Πεδίο για την Ημερομηνία
+    register_post_meta('fin_transaction', 'fin_date', [
+        'show_in_rest' => true,
+        'single'       => true,
+        'type'         => 'string', //  YYYY-MM-DD
+    ]);
 });
