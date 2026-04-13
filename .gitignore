@@ -1,0 +1,15 @@
+/app/public/wp-admin/
+/app/public/wp-includes/
+/app/public/wp-content/themes/
+/app/public/wp-content/upgrade/
+/app/public/wp-content/uploads/
+/app/public/*.php
+/app/public/*.html
+/app/public/*.txt
+/app/public/.htaccess
+/app/sql/
+/conf/
+/logs/
+
+/app/public/wp-content/plugins/*
+!/app/public/wp-content/plugins/my-finance-plugin/b
