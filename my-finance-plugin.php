@@ -15,7 +15,7 @@ add_action('init', 'my_fin_register_core_structures');
 function my_fin_register_core_structures() {
     
     register_taxonomy('fin_category', 'fin_transaction', [
-        'label'        => 'Κατηγορίες',
+        'label'        => 'Categories',
         'hierarchical' => true,
         'show_in_rest' => true, 
         'show_admin_column' => true,
@@ -23,7 +23,7 @@ function my_fin_register_core_structures() {
 
     
     register_post_type('fin_transaction', [
-        'labels'      => ['name' => 'Συναλλαγές', 'singular_name' => 'Συναλλαγή'],
+        'labels'      => ['name' => 'Transactions', 'singular_name' => 'Transaction'],
         'public'      => true,
         'show_in_rest' => true,
         'menu_icon'   => 'dashicons-chart-line',
@@ -31,20 +31,17 @@ function my_fin_register_core_structures() {
     ]);
 }
 
-// Δήλωση του πεδίου Ποσό
 add_action('init', function() {
     register_post_meta('fin_transaction', 'fin_amount', [
         'show_in_rest' => true,
         'single'       => true,
         'type'         => 'number',
     ]);
-    // Πεδίο για την Ημερομηνία
     register_post_meta('fin_transaction', 'fin_date', [
         'show_in_rest' => true,
         'single'       => true,
-        'type'         => 'string', //  YYYY-MM-DD
+        'type'         => 'string',
     ]);
-    // Πεδίο για το σχόλιο
     register_post_meta('fin_transaction', 'fin_description', [
     'show_in_rest' => true,
     'single'       => true,
