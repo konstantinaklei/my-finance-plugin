@@ -23,7 +23,14 @@ function my_fin_register_core_structures() {
 
     
     register_post_type('fin_transaction', [
-        'labels'      => ['name' => 'Transactions', 'singular_name' => 'Transaction'],
+        'labels'      => [
+            'name'          => 'Transactions', 
+            'singular_name' => 'Transaction',
+            'add_new'       => 'Add Transaction',     
+            'add_new_item'  => 'Add New Transaction', 
+            'all_items'     => 'All Transactions',    
+            'search_items'  => 'Search Transactions'
+        ],
         'public'      => true,
         'show_in_rest' => true,
         'menu_icon'   => 'dashicons-chart-line',
