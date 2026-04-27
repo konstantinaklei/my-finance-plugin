@@ -32,6 +32,7 @@ function my_fin_register_core_structures() {
             'search_items'  => 'Search Transactions'
         ],
         'public'      => true,
+        'publicly_queryable' => false,
         'show_in_rest' => true,
         'menu_icon'   => 'dashicons-chart-line',
         'supports'    => ['title', 'editor', 'custom-fields'],
@@ -49,9 +50,39 @@ add_action('init', function() {
         'single'       => true,
         'type'         => 'string',
     ]);
-    register_post_meta('fin_transaction', 'fin_description', [
+    register_post_meta('fin_transaction', 'fin_type', [
     'show_in_rest' => true,
     'single'       => true,
     'type'         => 'string',
     ]);
 });
+
+add_filter('wp_insert_post_data', 'my_fin_auto_title_by_id', 10, 2);
+function my_fin_auto_title_by_id($data, $postarr) {
+    if ($data['post_type'] == 'fin_transaction') {
+        if (empty($postarr['ID'])) {
+            $data['post_title'] = 'New Transaction';
+        } else {
+            $data['post_title'] = '#' . $postarr['ID'];
+        }
+    }
+    return $data;
+}
+
+add_action('save_post_fin_transaction', 'my_fin_update_title_after_save', 10, 3);
+function my_fin_update_title_after_save($post_id, $post, $update) {
+    if (wp_is_post_revision($post_id)) return;
+
+    $new_title = '#' . $post_id;
+    
+    if ($post->post_title !== $new_title) {
+        remove_action('save_post_fin_transaction', 'my_fin_update_title_after_save');
+        
+        wp_update_post([
+            'ID'         => $post_id,
+            'post_title' => $new_title
+        ]);
+        
+        add_action('save_post_fin_transaction', 'my_fin_update_title_after_save');
+    }
+}
