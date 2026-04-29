@@ -6,10 +6,10 @@ if (!defined('ABSPATH')) exit;
 class MySQLTransactionRepository {
     
     public function registerHooks() {
-        // Hooks για την αποθήκευση του Meta Box
+        
         add_action('save_post_fin_transaction', [$this, 'saveMetaBoxData']);
         
-        // Hooks για τον αυτόματο τίτλο (#ID)
+
         add_filter('wp_insert_post_data', [$this, 'autoTitleById'], 10, 2);
         add_action('save_post_fin_transaction', [$this, 'updateTitleAfterSave'], 10, 3);
     }

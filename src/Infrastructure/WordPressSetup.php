@@ -5,11 +5,13 @@ if (!defined('ABSPATH')) exit;
 
 class WordPressSetup {
     
-    // Εδώ "δένουμε" τις συναρτήσεις μας με τα Hooks του WordPress
+    
     public function registerHooks() {
         add_action('init', [$this, 'registerCoreStructures']);
         add_action('init', [$this, 'registerMetaFields']);
         add_action('add_meta_boxes', [$this, 'addCustomMetaBox']);
+
+        add_action('admin_footer', [$this, 'addGutenbergValidationScript']);
     }
 
     public function registerCoreStructures() {
@@ -62,6 +64,42 @@ class WordPressSetup {
                 </select>
             </div>
         </div>
+        <?php
+    }
+    //making amount date type fields complusory (required)
+    public function addGutenbergValidationScript() {
+        global $post;
+        if (!$post || $post->post_type !== 'fin_transaction') return;
+        ?>
+        <script>
+            window.onload = function() {
+                if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/editor')) {
+                    
+                    const checkFieldsAndLock = function() {
+                        const amount = document.getElementById('fin_amount')?.value;
+                        const date = document.getElementById('fin_date')?.value;
+                        const type = document.getElementById('fin_type')?.value;
+                        
+                        const isLocked = wp.data.select('core/editor').isPostSavingLocked('my_fin_lock');
+                        if (!amount || !date || !type) {
+                            if (!isLocked) {
+                                wp.data.dispatch('core/editor').lockPostSaving('my_fin_lock');
+                            }
+                        } else {
+                            // if they sssare filled unlock it
+                            if (isLocked) {
+                                wp.data.dispatch('core/editor').unlockPostSaving('my_fin_lock');
+                            }
+                        }
+                    };
+
+                    document.getElementById('fin_amount').addEventListener('input', checkFieldsAndLock);
+                    document.getElementById('fin_date').addEventListener('change', checkFieldsAndLock);
+                    document.getElementById('fin_type').addEventListener('change', checkFieldsAndLock);
+                    checkFieldsAndLock();
+                }
+            };
+        </script>
         <?php
     }
 }
