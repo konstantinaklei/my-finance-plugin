@@ -54,10 +54,12 @@ class WordPressSetup {
         wp_nonce_field('my_fin_save_meta_box_data', 'my_fin_meta_box_nonce');
         ?>
         <div style="display: flex; gap: 20px; margin-top: 10px;">
-            <div><label><strong>Ποσό (€):</strong></label><br><input type="number" step="0.01" name="fin_amount" value="<?php echo esc_attr($amount); ?>" required style="width: 100%;"></div>
-            <div><label><strong>Ημερομηνία:</strong></label><br><input type="date" name="fin_date" value="<?php echo esc_attr($date); ?>" required style="width: 100%;"></div>
+            <div><label><strong>Ποσό (€):</strong></label><br><input type="number" step="0.01" id="fin_amount" name="fin_amount" value="<?php echo esc_attr($amount); ?>" required style="width: 100%;"></div>
+            
+            <div><label><strong>Ημερομηνία:</strong></label><br><input type="date" id="fin_date" name="fin_date" value="<?php echo esc_attr($date); ?>" required style="width: 100%;"></div>
+            
             <div><label><strong>Τύπος:</strong></label><br>
-                <select name="fin_type" required style="width: 100%;">
+                <select id="fin_type" name="fin_type" required style="width: 100%;">
                     <option value="">Επίλεξε...</option>
                     <option value="income" <?php selected($type, 'income'); ?>>Έσοδο</option>
                     <option value="expense" <?php selected($type, 'expense'); ?>>Έξοδο</option>
@@ -72,7 +74,8 @@ class WordPressSetup {
         if (!$post || $post->post_type !== 'fin_transaction') return;
         ?>
         <script>
-            window.onload = function() {
+            document.addEventListener('DOMContentLoaded', function() {
+                const waitForGutenberg = setInterval(function() {
                 if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/editor')) {
                     
                     const checkFieldsAndLock = function() {
@@ -98,7 +101,8 @@ class WordPressSetup {
                     document.getElementById('fin_type').addEventListener('change', checkFieldsAndLock);
                     checkFieldsAndLock();
                 }
-            };
+            } , 500);
+        });
         </script>
         <?php
     }
