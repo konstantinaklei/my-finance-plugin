@@ -15,6 +15,21 @@ class DashboardShortcode {
         <div class="wrap" style="max-width: 800px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
             <h2>Financial Dashboard</h2>
 
+            <div style="margin-bottom: 20px; padding: 15px; background: #f1f1f1; border-radius: 5px; display: flex; gap: 15px; align-items: center;">
+                <div>
+                    <label for="fin_date_from"><strong>From:</strong></label><br>
+                    <input type="date" id="fin_date_from" name="fin_date_from">
+                </div>
+                <div>
+                    <label for="fin_date_to"><strong>To:</strong></label><br>
+                    <input type="date" id="fin_date_to" name="fin_date_to">
+                </div>
+                <div>
+                    <br>
+                    <button type="button" id="fin_filter_btn" style="padding: 6px 15px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">Φιλτράρισμα</button>
+                </div>
+            </div>
+
             <?php
             $args = [
                 'post_type'      => 'fin_transaction',
@@ -33,7 +48,7 @@ class DashboardShortcode {
                             <th>Amount (€)</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="finance-table-body">
                     <?php
                     
                     $total_balance = 0; 
@@ -74,7 +89,7 @@ class DashboardShortcode {
                 </table>
                 <?php wp_reset_postdata(); ?>
             <?php else : ?>
-                <p>No Transactions found.</p>
+                <p id="finance-no-results">No Transactions found.</p>
             <?php endif; ?>
         </div>
         <?php
