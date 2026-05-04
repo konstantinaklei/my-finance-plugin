@@ -5,7 +5,6 @@ if (!defined('ABSPATH')) exit;
 
 class DashboardShortcode {
     
-    // Register shortcode in WordPress
     public function registerHooks() {
         add_shortcode('finance_dashboard', [$this, 'render']);
     }
@@ -36,21 +35,42 @@ class DashboardShortcode {
                     </thead>
                     <tbody>
                     <?php
+                    
+                    $total_balance = 0; 
+
                     while ($finance_query->have_posts()) : $finance_query->the_post();
-                        $amount = get_post_meta(get_the_ID(), 'fin_amount', true);
+                        $amount = (float) get_post_meta(get_the_ID(), 'fin_amount', true);
                         $date   = get_post_meta(get_the_ID(), 'fin_date', true);
                         $type   = get_post_meta(get_the_ID(), 'fin_type', true);
                         
-                        $type_label = ($type === 'income') ? '<span style="color:green; font-weight:bold;">Έσοδο</span>' : '<span style="color:red; font-weight:bold;">Έξοδο</span>';
+                        //final amount
+                        if ($type === 'income') {
+                            $total_balance += $amount;
+                            $type_label = '<span style="color:green; font-weight:bold;">Έσοδο</span>';
+                        } else {
+                            $total_balance -= $amount;
+                            $type_label = '<span style="color:red; font-weight:bold;">Έξοδο</span>';
+                        }
                         ?>
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 10px 0;"><?php the_title(); ?></td>
                             <td><?php echo esc_html($date); ?></td>
                             <td><?php echo $type_label; ?></td>
-                            <td><strong><?php echo esc_html($amount); ?> €</strong></td>
+                            <td><strong><?php echo number_format($amount, 2, ',', '.'); ?> €</strong></td>
                         </tr>
                     <?php endwhile; ?>
                     </tbody>
+            
+                    <tfoot>
+                        <tr style="background-color: #f9f9f9; border-top: 2px solid #333;">
+                            <td colspan="3" style="text-align: right; padding: 15px 10px;"><strong>Συνολικό Υπόλοιπο:</strong></td>
+                            <td style="padding: 15px 10px; font-size: 1.1em;">
+                                <strong style="color: <?php echo ($total_balance >= 0) ? 'green' : 'red'; ?>;">
+                                    <?php echo number_format($total_balance, 2, ',', '.'); ?> €
+                                </strong>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
                 <?php wp_reset_postdata(); ?>
             <?php else : ?>
