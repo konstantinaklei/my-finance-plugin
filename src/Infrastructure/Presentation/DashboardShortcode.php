@@ -26,7 +26,7 @@ class DashboardShortcode {
                 </div>
                 <div>
                     <br>
-                    <button type="button" id="fin_filter_btn" style="padding: 6px 15px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">Φιλτράρισμα</button>
+                    <button type="button" id="fin_filter_btn" style="padding: 6px 15px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">Filter</button>
                 </div>
             </div>
 
@@ -78,7 +78,7 @@ class DashboardShortcode {
             
                     <tfoot>
                         <tr style="background-color: #f9f9f9; border-top: 2px solid #333;">
-                            <td colspan="3" style="text-align: right; padding: 15px 10px;"><strong>Συνολικό Υπόλοιπο:</strong></td>
+                            <td colspan="3" style="text-align: right; padding: 15px 10px;"><strong>Final Amount:</strong></td>
                             <td style="padding: 15px 10px; font-size: 1.1em;">
                                 <strong style="color: <?php echo ($total_balance >= 0) ? 'green' : 'red'; ?>;">
                                     <?php echo number_format($total_balance, 2, ',', '.'); ?> €
