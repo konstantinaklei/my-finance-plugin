@@ -30,4 +30,7 @@ add_action('plugins_loaded', function() {
 
     $repository = new \MyFinance\Infrastructure\Persistence\MySQLTransactionRepository();
     $repository->registerHooks();
+
+    $dashboard = new \MyFinance\Infrastructure\Presentation\DashboardShortcode();
+    $dashboard->registerHooks();
 });
