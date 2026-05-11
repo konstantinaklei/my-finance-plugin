@@ -33,4 +33,9 @@ add_action('plugins_loaded', function() {
 
     $dashboard = new \MyFinance\Infrastructure\Presentation\DashboardShortcode();
     $dashboard->registerHooks();
+
+    $cronManager = new \MyFinance\Infrastructure\FinanceCronManager();
+    $cronManager->init();
 });
+
+register_deactivation_hook(__FILE__, ['\MyFinance\Infrastructure\FinanceCronManager', 'deactivate']);
