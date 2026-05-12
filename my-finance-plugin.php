@@ -7,7 +7,7 @@
  */
 
 if (!defined('ABSPATH')) exit;
-
+use MyFinance\Infrastructure\Presentation\StatsShortcode;
 
 spl_autoload_register(function ($class) {
     $prefix = 'MyFinance\\';
@@ -36,6 +36,9 @@ add_action('plugins_loaded', function() {
 
     $cronManager = new \MyFinance\Infrastructure\FinanceCronManager();
     $cronManager->init();
+
+    $statsShortcode = new StatsShortcode();
+    $statsShortcode->registerHooks();
 });
 
 register_deactivation_hook(__FILE__, ['\MyFinance\Infrastructure\FinanceCronManager', 'deactivate']);
