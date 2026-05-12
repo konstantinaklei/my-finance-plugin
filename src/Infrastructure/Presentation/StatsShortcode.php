@@ -2,31 +2,13 @@
 declare(strict_types=1);
 namespace MyFinance\Infrastructure\Presentation;
 
-class AdminDashboard {
+class StatsShortcode {
     
     public function registerHooks(): void {
-        add_action('admin_menu', [$this, 'addMenuPage']);
-        add_action('admin_enqueue_scripts', [$this, 'enqueueScripts']);
+        add_shortcode('finance_stats', [$this, 'renderShortcode']);
+        
         add_action('wp_ajax_get_finance_chart_data', [$this, 'getChartData']);
-    }
-
-    public function addMenuPage(): void {
-        add_menu_page(
-            'Stats',                 // Page's title
-            'Stats',                 // menu label
-            'manage_options',
-            'finance-stats',
-            [$this, 'renderPage'],
-            'dashicons-chart-bar',  
-            30
-        );
-    }
-
-    public function enqueueScripts(string $hook): void {
-        if ($hook !== 'toplevel_page_finance-stats') {
-            return;
-        }
-        wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', [], '4.4.0', true);
+        add_action('wp_ajax_nopriv_get_finance_chart_data', [$this, 'getChartData']);
     }
 
     public function getChartData(): void {
@@ -76,11 +58,13 @@ class AdminDashboard {
         ]);
     }
 
-    public function renderPage(): void {
+    public function renderShortcode($atts): string {
+        wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', [], '4.4.0', true);
+
+        ob_start();
         ?>
-        <div class="wrap" style="font-family: sans-serif; max-width: 800px;">
-            <h2>Finance Stats</h2>
-            <p>Cash Flow Analysis</p>
+        <div class="finance-stats-wrap" style="max-width: 800px; margin: 40px auto; font-family: sans-serif;">
+            <h2>Financial Stats</h2>
 
             <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 20px;">
                 <canvas id="cashFlowBarChart"></canvas>
@@ -98,14 +82,13 @@ class AdminDashboard {
                             method: 'POST',
                             body: formData
                         });
-                        
                         const res = await response.json();
 
                         if (res.success) {
                             drawChart(res.data);
                         }
                     } catch (error) {
-                        console.error("error", error);
+                        console.error("Σφάλμα:", error);
                     }
                 }
 
@@ -136,5 +119,6 @@ class AdminDashboard {
             </script>
         </div>
         <?php
+        return ob_get_clean();
     }
 }
