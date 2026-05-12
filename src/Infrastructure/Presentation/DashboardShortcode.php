@@ -122,7 +122,7 @@ class DashboardShortcode {
                     <select id="fin_type_filter" name="fin_type_filter" style="padding: 4px;">
                         <option value=""><?php esc_html_e('All', 'my-finance'); ?></option>
                         <option value="income"><?php esc_html_e('Income', 'my-finance'); ?></option>
-                        <option value="expense"><?php esc_html_e('Expense', 'my-finance'); ?></option>
+                        <option value="expense"><?php esc_html_e('Expense     ', 'my-finance'); ?></option>
                     </select>
                 </div>
 
