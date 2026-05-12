@@ -16,6 +16,7 @@ class DashboardShortcode {
     public function handleAjaxFilter() {
         $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
         $date_to   = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
+        $fin_type  = isset($_POST['fin_type']) ? sanitize_text_field($_POST['fin_type']) : '';
 
         $args = [
             'post_type'      => 'fin_transaction',
@@ -25,6 +26,8 @@ class DashboardShortcode {
             'orderby'        => 'meta_value',
             'order'          => 'DESC'
         ];
+
+        $meta_query = ['relation' => 'AND'];
 
         if (!empty($date_from) || !empty($date_to)) {
             $args['meta_query'] = ['relation' => 'AND'];
@@ -45,6 +48,17 @@ class DashboardShortcode {
                     'type'    => 'DATE'
                 ];
             }
+
+            if (!empty($fin_type) && in_array($fin_type, ['income', 'expense'])) {
+            $meta_query[] = [
+                'key'     => 'fin_type',
+                'value'   => $fin_type,
+                'compare' => '='
+            ];
+        }
+
+        if (count($meta_query) > 1) {
+            $args['meta_query'] = $meta_query;
         }
 
         $query = new \WP_Query($args);
@@ -60,50 +74,65 @@ class DashboardShortcode {
 
                 if ($type === 'income') {
                     $total_balance += $amount;
-                    $type_label = '<span style="color:green; font-weight:bold;">Έσοδο</span>';
+                    $type_label = '<span style="color:green; font-weight:bold;">' . esc_html__('Income', 'my-finance') . '</span>';
                 } else {
                     $total_balance -= $amount;
-                    $type_label = '<span style="color:red; font-weight:bold;">Έξοδο</span>';
+                    $type_label = '<span style="color:red; font-weight:bold;">' . esc_html__('Expense', 'my-finance') . '</span>';
                 }
 
                 $html .= '<tr style="border-bottom: 1px solid #eee;">';
                 $html .= '<td style="padding: 10px 0;">' . get_the_title() . '</td>';
                 $html .= '<td>' . esc_html($date) . '</td>';
                 $html .= '<td>' . $type_label . '</td>';
-                $html .= '<td><strong>' . number_format($amount, 2, ',', '.') . ' €</strong></td>';
+                $html .= '<td><strong>' . number_format($amount, 2, '.', ',') . ' €</strong></td>';
                 $html .= '</tr>';
             }
             wp_reset_postdata();
         } else {
-            $html = '<tr><td colspan="4" style="padding:20px; text-align:center;">No results found for this range.</td></tr>';
+           $html = '<tr><td colspan="4" style="padding:20px; text-align:center;">' . esc_html__('No results found for this range.', 'my-finance') . '</td></tr>';
         }
 
         
         wp_send_json_success([
             'table_html'    => $html,
-            'total_balance' => number_format($total_balance, 2, ',', '.') . ' €',
+            'total_balance' => number_format($total_balance, 2, '.', ',') . ' €',
             'is_positive'   => ($total_balance >= 0)
         ]);
     }
+    }
 
-    public function render($atts) {
+   public function render($atts) {
         ob_start(); 
         ?>
         <div class="wrap" style="max-width: 800px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
-            <h2>Financial Dashboard</h2>
+            <h2><?php esc_html_e('Financial Dashboard', 'my-finance'); ?></h2>
 
-            <div style="margin-bottom: 20px; padding: 15px; background: #f1f1f1; border-radius: 5px; display: flex; gap: 15px; align-items: center;">
+            <div style="margin-bottom: 20px; padding: 15px; background: #f1f1f1; border-radius: 5px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
                 <div>
-                    <label for="fin_date_from"><strong>From:</strong></label><br>
+                    <label for="fin_date_from"><strong><?php esc_html_e('From:', 'my-finance'); ?></strong></label><br>
                     <input type="date" id="fin_date_from" name="fin_date_from">
                 </div>
                 <div>
-                    <label for="fin_date_to"><strong>To:</strong></label><br>
+                    <label for="fin_date_to"><strong><?php esc_html_e('To:', 'my-finance'); ?></strong></label><br>
                     <input type="date" id="fin_date_to" name="fin_date_to">
                 </div>
+                
                 <div>
-                    <br>
-                    <button type="button" id="fin_filter_btn" style="padding: 6px 15px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">Filter</button>
+                    <label for="fin_type_filter"><strong><?php esc_html_e('Type:', 'my-finance'); ?></strong></label><br>
+                    <select id="fin_type_filter" name="fin_type_filter" style="padding: 4px;">
+                        <option value=""><?php esc_html_e('All', 'my-finance'); ?></option>
+                        <option value="income"><?php esc_html_e('Income', 'my-finance'); ?></option>
+                        <option value="expense"><?php esc_html_e('Expense', 'my-finance'); ?></option>
+                    </select>
+                </div>
+
+                <div>
+                    <button type="button" id="fin_filter_btn" style="padding: 6px 15px; background: #007cba; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                        <?php esc_html_e('Filter', 'my-finance'); ?>
+                    </button>
+                    <button type="button" id="fin_clear_btn" style="padding: 6px 15px; background: #dc3232; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">
+                        <?php esc_html_e('Clear All', 'my-finance'); ?>
+                    </button>
                 </div>
             </div>
 
@@ -111,7 +140,10 @@ class DashboardShortcode {
             $args = [
                 'post_type'      => 'fin_transaction',
                 'posts_per_page' => -1,
-                'post_status'    => 'publish'
+                'post_status'    => 'publish',
+                'meta_key'       => 'fin_date',
+                'orderby'        => 'meta_value',
+                'order'          => 'DESC'
             ];
             $finance_query = new \WP_Query($args);
 
@@ -119,10 +151,10 @@ class DashboardShortcode {
                 <table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 20px;">
                     <thead>
                         <tr style="border-bottom: 2px solid #ccc;">
-                            <th>Title</th>
-                            <th>Date</th>
-                            <th>Type</th>
-                            <th>Amount (€)</th>
+                            <th><?php esc_html_e('Title', 'my-finance'); ?></th>
+                            <th><?php esc_html_e('Date', 'my-finance'); ?></th>
+                            <th><?php esc_html_e('Type', 'my-finance'); ?></th>
+                            <th><?php esc_html_e('Amount (€)', 'my-finance'); ?></th>
                         </tr>
                     </thead>
                     <tbody id="finance-table-body">
@@ -135,30 +167,29 @@ class DashboardShortcode {
                         $date   = get_post_meta(get_the_ID(), 'fin_date', true);
                         $type   = get_post_meta(get_the_ID(), 'fin_type', true);
                         
-                        //final amount
                         if ($type === 'income') {
                             $total_balance += $amount;
-                            $type_label = '<span style="color:green; font-weight:bold;">Έσοδο</span>';
+                            $type_label = '<span style="color:green; font-weight:bold;">' . esc_html__('Income', 'my-finance') . '</span>';
                         } else {
                             $total_balance -= $amount;
-                            $type_label = '<span style="color:red; font-weight:bold;">Έξοδο</span>';
+                            $type_label = '<span style="color:red; font-weight:bold;">' . esc_html__('Expense', 'my-finance') . '</span>';
                         }
                         ?>
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 10px 0;"><?php the_title(); ?></td>
                             <td><?php echo esc_html($date); ?></td>
                             <td><?php echo $type_label; ?></td>
-                            <td><strong><?php echo number_format($amount, 2, ',', '.'); ?> €</strong></td>
+                            <td><strong><?php echo number_format($amount, 2, '.', ','); ?> €</strong></td>
                         </tr>
                     <?php endwhile; ?>
                     </tbody>
             
                     <tfoot>
                         <tr style="background-color: #f9f9f9; border-top: 2px solid #333;">
-                            <td colspan="3" style="text-align: right; padding: 15px 10px;"><strong>Final Amount:</strong></td>
+                            <td colspan="3" style="text-align: right; padding: 15px 10px;"><strong><?php esc_html_e('Final Amount:', 'my-finance'); ?></strong></td>
                             <td style="padding: 15px 10px; font-size: 1.1em;">
                                 <strong id="finance-total-balance" style="color: <?php echo ($total_balance >= 0) ? 'green' : 'red'; ?>;">
-                                    <?php echo number_format($total_balance, 2, ',', '.'); ?> €
+                                    <?php echo number_format($total_balance, 2, '.', ','); ?> €
                                 </strong>
                             </td>
                         </tr>
@@ -166,50 +197,64 @@ class DashboardShortcode {
                 </table>
                 <?php wp_reset_postdata(); ?>
             <?php else : ?>
-                <p id="finance-no-results">No Transactions found.</p>
+                <p id="finance-no-results"><?php esc_html_e('No Transactions found.', 'my-finance'); ?></p>
             <?php endif; ?>
         </div>
 
         <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const btn = document.getElementById('fin_filter_btn');
+            const filterBtn = document.getElementById('fin_filter_btn');
+            const clearBtn  = document.getElementById('fin_clear_btn');
             
-            if (btn) {
-                btn.addEventListener('click', function() {
-                    const dateFrom = document.getElementById('fin_date_from').value;
-                    const dateTo = document.getElementById('fin_date_to').value;
+            function fetchFilteredData() {
+                const dateFrom = document.getElementById('fin_date_from').value;
+                const dateTo   = document.getElementById('fin_date_to').value;
+                const finType  = document.getElementById('fin_type_filter').value;
+                
+                const originalText = filterBtn.innerText;
+                filterBtn.innerText = '<?php esc_html_e('Loading...', 'my-finance'); ?>';
+                filterBtn.disabled = true;
+
+                const formData = new FormData();
+                formData.append('action', 'filter_finance_dashboard');
+                formData.append('date_from', dateFrom);
+                formData.append('date_to', dateTo);
+                formData.append('fin_type', finType);
+
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        document.getElementById('finance-table-body').innerHTML = res.data.table_html;
+                        const balanceEl = document.getElementById('finance-total-balance');
+                        balanceEl.innerText = res.data.total_balance;
+                        balanceEl.style.color = res.data.is_positive ? 'green' : 'red';
+                    }
+
+                    filterBtn.innerText = originalText;
+                    filterBtn.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    filterBtn.innerText = originalText;
+                    filterBtn.disabled = false;
+                });
+            }
+
+            if (filterBtn) {
+                filterBtn.addEventListener('click', fetchFilteredData);
+            }
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    document.getElementById('fin_date_from').value = '';
+                    document.getElementById('fin_date_to').value = '';
+                    document.getElementById('fin_type_filter').value = '';
                     
-                    // changing the button's text in loading...
-                    const originalText = btn.innerText;
-                    btn.innerText = 'Loading...';
-                    btn.disabled = true;
-
-                    const formData = new FormData();
-                    formData.append('action', 'filter_finance_dashboard');
-                    formData.append('date_from', dateFrom);
-                    formData.append('date_to', dateTo);
-
-                    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(res => res.json())
-                    .then(res => {
-                        if (res.success) {
-                            document.getElementById('finance-table-body').innerHTML = res.data.table_html;
-                            const balanceEl = document.getElementById('finance-total-balance');
-                            balanceEl.innerText = res.data.total_balance;
-                            balanceEl.style.color = res.data.is_positive ? 'green' : 'red';
-                        }
-
-                        btn.innerText = originalText;
-                        btn.disabled = false;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        btn.innerText = originalText;
-                        btn.disabled = false;
-                    });
+                    fetchFilteredData();
                 });
             }
         });
