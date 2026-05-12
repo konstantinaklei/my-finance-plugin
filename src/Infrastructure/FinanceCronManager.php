@@ -14,6 +14,40 @@ class FinanceCronManager {
     }
 
     public function handleDailyTask(): void {
+        $yesterday = date('Y-m-d', strtotime('-1 days'));
+
+        $args = [
+        'post_type'  => 'fin_transaction',
+        'meta_query' => [
+            [
+                'key'   => 'fin_date',
+                'value' => $yesterday,
+            ],
+            [
+                'key'   => 'fin_type',
+                'value' => 'expense',
+            ]
+        ]
+    ];
+    $query = new \WP_Query($args);
+    $total_expenses = 0;
+
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            $total_expenses += (float) get_post_meta(get_the_ID(), 'fin_amount', true);
+        }
+        wp_reset_postdata();
+    }
+
+    if ($total_expenses > 0) {
+        $admin_email = get_option('admin_email');
+        wp_mail(
+            $admin_email, 
+            'Ημερήσια Αναφορά Εξόδων', 
+            "Χθες ξοδέψατε συνολικά: {$total_expenses} €"
+        );
+    }
         error_log('Finance Plugin Cron Job ran successfully!');
         
     }
