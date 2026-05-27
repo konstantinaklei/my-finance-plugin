@@ -46,6 +46,3 @@ Deploy your analytics dashboards anywhere on your site using the following short
 
 ### 1.0.0
 * **Initial release:** Implemented OOP architecture, AJAX filtering, Chart.js integrations, and WP-Cron automated reporting.
-
-= 1.0.0 =
-* Initial release: Implemented OOP architecture, AJAX filtering, Chart.js integrations, and WP-Cron automated reporting.
