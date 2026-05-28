@@ -29,36 +29,34 @@ class DashboardShortcode {
 
         $meta_query = ['relation' => 'AND'];
 
-        if (!empty($date_from) || !empty($date_to)) {
-            $args['meta_query'] = ['relation' => 'AND'];
-            
-            if (!empty($date_from)) {
-                $args['meta_query'][] = [
-                    'key'     => 'fin_date',
-                    'value'   => $date_from,
-                    'compare' => '>=',
-                    'type'    => 'DATE'
-                ];
-            }
-            if (!empty($date_to)) {
-                $args['meta_query'][] = [
-                    'key'     => 'fin_date',
-                    'value'   => $date_to,
-                    'compare' => '<=',
-                    'type'    => 'DATE'
-                ];
-            }
+        if (!empty($date_from)) { 
+            $meta_query[] = [ 
+                'key'     => 'fin_date', 
+                'value'   => $date_from, 
+                'compare' => '>=', 
+                'type'    => 'DATE' 
+            ]; 
+        }
 
-            if (!empty($fin_type) && in_array($fin_type, ['income', 'expense'])) {
+        if (!empty($date_to)) {
             $meta_query[] = [
-                'key'     => 'fin_type',
-                'value'   => $fin_type,
-                'compare' => '='
+                'key'     => 'fin_date',
+                'value'   => $date_to,
+                'compare' => '<=',
+                'type'    => 'DATE'
             ];
         }
 
-        if (count($meta_query) > 1) {
-            $args['meta_query'] = $meta_query;
+        if (!empty($fin_type) && in_array($fin_type, ['income', 'expense'])) { 
+            $meta_query[] = [ 
+                'key'     => 'fin_type', 
+                'value'   => $fin_type, 
+                'compare' => '=' 
+            ]; 
+        }
+
+        if (count($meta_query) > 1) { 
+            $args['meta_query'] = $meta_query; 
         }
 
         $query = new \WP_Query($args);
@@ -98,10 +96,9 @@ class DashboardShortcode {
             'total_balance' => number_format($total_balance, 2, '.', ',') . ' €',
             'is_positive'   => ($total_balance >= 0)
         ]);
-    }
-    }
+    }  
 
-   public function render($atts) {
+    public function render($atts) {
         ob_start(); 
         ?>
         <div class="wrap" style="max-width: 800px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
