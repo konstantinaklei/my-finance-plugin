@@ -64,7 +64,7 @@ class StatsShortcode {
         ob_start();
         ?>
         <div class="finance-stats-wrap" style="max-width: 800px; margin: 40px auto; font-family: sans-serif;">
-            <h2><?php esc_html_e('Financial Stats', 'my-finance'); ?></h2>
+            <h2><?php esc_html_e('Financial Stats', 'my-finance-plugin'); ?></h2>
 
             <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 20px;">
                 <canvas id="cashFlowBarChart"></canvas>
@@ -88,7 +88,7 @@ class StatsShortcode {
                             drawChart(res.data);
                         }
                     } catch (error) {
-                        console.error('<?php echo esc_js(__('Error:', 'my-finance')); ?>', error);
+                        console.error('<?php echo esc_js(__('Error:', 'my-finance-plugin')); ?>', error);
                     }
                 }
 
@@ -100,12 +100,12 @@ class StatsShortcode {
                             labels: data.labels,
                             datasets: [
                                 {
-                                    label: '<?php echo esc_js(__('Income', 'my-finance')); ?>',
+                                    label: '<?php echo esc_js(__('Income', 'my-finance-plugin')); ?>',
                                     data: data.incomes,
                                     backgroundColor: '#4CAF50'
                                 },
                                 {
-                                    label: '<?php echo esc_js(__('Expense', 'my-finance')); ?>',
+                                    label: '<?php echo esc_js(__('Expense', 'my-finance-plugin')); ?>',
                                     data: data.expenses,
                                     backgroundColor: '#F44336'
                                 }
