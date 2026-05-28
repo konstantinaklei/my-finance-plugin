@@ -175,7 +175,7 @@ class DashboardShortcode {
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 10px 0;"><?php the_title(); ?></td>
                             <td><?php echo esc_html($date); ?></td>
-                            <td><?php echo esc_html($type_label); ?></td>
+                            <td><?php echo wp_kses_post($type_label); ?></td>
                             <td><strong><?php echo number_format($amount, 2, '.', ','); ?> €</strong></td>
                         </tr>
                     <?php endwhile; ?>
