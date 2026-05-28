@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace MyFinance\Infrastructure;
 
+if (!defined('ABSPATH')) { exit; }
+
 class FinanceCronManager {
     private const CRON_HOOK = 'finance_plugin_daily_task';
 
@@ -14,7 +16,7 @@ class FinanceCronManager {
     }
 
     public function handleDailyTask(): void {
-        $yesterday = date('Y-m-d', strtotime('-1 days'));
+        $yesterday = gmdate('Y-m-d', strtotime('-1 days'));
 
         $args = [
         'post_type'  => 'fin_transaction',
@@ -48,7 +50,8 @@ class FinanceCronManager {
             "Χθες ξοδέψατε συνολικά: {$total_expenses} €"
         );
     }
-        error_log('Finance Plugin Cron Job ran successfully!');
+        //Debug
+        //error_log('Finance Plugin Cron Job ran successfully!');
         
     }
 

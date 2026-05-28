@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace MyFinance\Infrastructure\Presentation;
 
+if (!defined('ABSPATH')) { exit; }
+
 class StatsShortcode {
     
     public function registerHooks(): void {
@@ -34,7 +36,7 @@ class StatsShortcode {
                 $type   = get_post_meta(get_the_ID(), 'fin_type', true);
                 $date   = get_post_meta(get_the_ID(), 'fin_date', true);
 
-                $month_year = date('m/Y', strtotime($date));
+                $month_year = gmdate('m/Y', strtotime($date));
 
                 if (!in_array($month_year, $bar_months)) {
                     $bar_months[] = $month_year;
@@ -78,7 +80,7 @@ class StatsShortcode {
                     formData.append('action', 'get_finance_chart_data');
 
                     try {
-                        const response = await fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                        const response = await fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
                             method: 'POST',
                             body: formData
                         });

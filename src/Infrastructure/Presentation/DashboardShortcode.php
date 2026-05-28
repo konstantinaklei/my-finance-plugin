@@ -178,7 +178,7 @@ class DashboardShortcode {
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 10px 0;"><?php the_title(); ?></td>
                             <td><?php echo esc_html($date); ?></td>
-                            <td><?php echo $type_label; ?></td>
+                            <td><?php echo esc_html($type_label); ?></td>
                             <td><strong><?php echo number_format($amount, 2, '.', ','); ?> €</strong></td>
                         </tr>
                     <?php endwhile; ?>
@@ -221,7 +221,7 @@ class DashboardShortcode {
                 formData.append('date_to', dateTo);
                 formData.append('fin_type', finType);
 
-                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
                     method: 'POST',
                     body: formData
                 })

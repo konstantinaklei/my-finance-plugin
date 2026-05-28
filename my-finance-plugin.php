@@ -1,5 +1,6 @@
 <?php
 /**
+ * License: GPLv2 or later
  * Plugin Name: My Finance
  * Description: Σύστημα Διαχείρισης Εσόδων - Εξόδων (Clean Architecture).
  * Version: 1.2
