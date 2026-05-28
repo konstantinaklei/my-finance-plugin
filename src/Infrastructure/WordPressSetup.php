@@ -46,7 +46,7 @@ class WordPressSetup {
         add_meta_box('fin_transaction_details', 'Οικονομικά Στοιχεία', [$this, 'renderMetaBox'], 'fin_transaction', 'normal', 'high');
     }
 
-    public function renderMetaBox($post) {
+    public function renderMetaBox(\WP_Post $post) {
         $amount = get_post_meta($post->ID, 'fin_amount', true);
         $date   = get_post_meta($post->ID, 'fin_date', true);
         $type   = get_post_meta($post->ID, 'fin_type', true);
