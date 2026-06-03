@@ -16,7 +16,7 @@ class FinanceCronManager {
     }
 
     public function handleDailyTask(): void {
-        $yesterday = gmdate('Y-m-d', strtotime('-1 days'));
+        $yesterday = wp_date('Y-m-d', strtotime('-1 days'));
 
         $args = [
         'post_type'  => 'fin_transaction',
