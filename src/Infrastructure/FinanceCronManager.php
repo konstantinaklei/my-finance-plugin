@@ -20,7 +20,10 @@ class FinanceCronManager {
 
         $args = [
         'post_type'  => 'fin_transaction',
+        'posts_per_page' => -1,
+        'post_status'    => 'publish',
         'meta_query' => [
+            'relation' => 'AND',
             [
                 'key'   => 'fin_date',
                 'value' => $yesterday,
